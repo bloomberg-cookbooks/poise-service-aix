@@ -18,12 +18,15 @@ module PoiseService
     class Provider
       provides(:aix_service, os: 'aix')
 
-      # Reload action for the AIX service provider.
+      # The reload action for the AIX service provider.
       def action_reload
         return if options['never_reload']
       end
 
+      # Parse the PID from `lssrc -s <name>` output.
+      # @reeturn [Integer]
       def pid
+
       end
 
       private
@@ -39,29 +42,20 @@ module PoiseService
           arguments command.shift
           user new_resource.user
         end
-
-        template "/etc/rc.d/init.d/#{new_resource.service_name}" do
-          mode '0755'
-          source 'service.sh.erb'
-          variables(
-            name: new_resource.service_name,
-            directory: new_resource.directory,
-            arguments: command.shift,
-            environment: new_resource.environment,
-            pid_file: new_resource.pid_file)
-        end
       end
 
       def enable_service
+        options['inittab']['runlevel'] ||= 2
         aix_inittab "enable #{new_resource.service_name}" do
-          runlevel '2'
+          runlevel options['inittab']['runlevel']
           command "/etc/rc.d/init.d/#{new_resource.service_name} start >/dev/null 2>&1"
         end
       end
 
       def disable_service
+        options['inittab']['runlevel'] ||= 2
         aix_inittab "disable #{new_resource.service_name}" do
-          runlevel '2'
+          runlevel options['inittab']['runlevel']
           command "/etc/rc.d/init.d/#{new_resource.service_name} start >/dev/null 2>&1"
           action :disable
         end
@@ -72,10 +66,6 @@ module PoiseService
           subsystem_name new_resource.service_name
           action :delete
         end
-
-        file "/etc/rc.d/init.d/#{new_resource.service_name}" do
-          action :delete
-        end
       end
 
       def service_provider
@@ -83,7 +73,8 @@ module PoiseService
       end
 
       def service_resource
-        @service_resource ||= Chef::Resource::AixInittab.new(new_resource.name, run_context).tap do |r|
+        @service_resource ||= Chef::Resource::AixSubsystem.new(new_resource.name, run_context).tap do |r|
+
           r.identifier = new_resource.service_name
         end
       end
