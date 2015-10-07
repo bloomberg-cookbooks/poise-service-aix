@@ -21,12 +21,13 @@ module PoiseService
       # The reload action for the AIX service provider.
       def action_reload
         return if options['never_reload']
+        # TODO: not sure?
       end
 
       # Parse the PID from `lssrc -s <name>` output.
-      # @reeturn [Integer]
+      # @return [Integer]
       def pid
-
+        # TODO: implement this
       end
 
       private
