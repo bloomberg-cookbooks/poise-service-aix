@@ -33,9 +33,6 @@ module PoiseService
 
       def create_service
         command = new_resource.command.split(' ')
-
-        check_signals!
-
         aix_subsystem "create #{new_resource.service_name}" do
           subsystem_name new_resource.service_name
           program command.first
@@ -48,7 +45,7 @@ module PoiseService
         options['inittab']['runlevel'] ||= 2
         aix_inittab "enable #{new_resource.service_name}" do
           runlevel options['inittab']['runlevel']
-          command "/etc/rc.d/init.d/#{new_resource.service_name} start >/dev/null 2>&1"
+          command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
         end
       end
 
@@ -56,7 +53,7 @@ module PoiseService
         options['inittab']['runlevel'] ||= 2
         aix_inittab "disable #{new_resource.service_name}" do
           runlevel options['inittab']['runlevel']
-          command "/etc/rc.d/init.d/#{new_resource.service_name} start >/dev/null 2>&1"
+          command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
           action :disable
         end
       end
@@ -69,13 +66,8 @@ module PoiseService
       end
 
       def service_provider
-        Chef::Provider::Service::Aix
-      end
-
-      def service_resource
-        @service_resource ||= Chef::Resource::AixSubsystem.new(new_resource.name, run_context).tap do |r|
-
-          r.identifier = new_resource.service_name
+        super.tap do |r|
+          r.provider(Chef::Provider::Service::Aix)
         end
       end
     end
