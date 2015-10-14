@@ -17,7 +17,11 @@ module PoiseService
     # @since 1.0.0
     class Provider < Base
       include Chef::Mixin::ShellOut
-      provides(:aix_service, os: 'aix')
+      provides(:aix_service)
+
+      def self.provides_auto?(node, resource)
+        node['platform_family'] == 'aix'
+      end
 
       # Parse the PID from `lssrc -s <name>` output.
       # @return [Integer]
