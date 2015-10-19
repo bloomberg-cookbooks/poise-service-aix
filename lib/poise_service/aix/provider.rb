@@ -18,6 +18,7 @@ module PoiseService
     class Provider < Base
       include Chef::Mixin::ShellOut
       provides(:aix_service)
+      DEFAULT_RUN_LEVEL = '2'
 
       def self.provides_auto?(node, resource)
         node['platform_family'] == 'aix'
@@ -35,8 +36,7 @@ module PoiseService
       def create_service
         Chef::Log.debug("Creating aix service #{new_resource.service_name}")
         command = new_resource.command.split(' ')
-        aix_subsystem "create #{new_resource.service_name}" do
-          subsystem_name new_resource.service_name
+        aix_subsystem "#{new_resource.service_name}" do
           program command.first
           arguments command.drop(1)
           user new_resource.user
@@ -45,18 +45,18 @@ module PoiseService
 
       def enable_service
         Chef::Log.debug("Enabling aix service #{new_resource.service_name}")
-        options['inittab']['runlevel'] ||= 2
-        aix_inittab "enable #{new_resource.service_name}" do
-          runlevel options['inittab']['runlevel']
+        aix_inittab "#{new_resource.service_name}" do
+          runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
+          processaction "once"
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
         end
       end
 
       def disable_service
         Chef::Log.debug("Disabling aix service #{new_resource.service_name}")
-        options['inittab']['runlevel'] ||= 2
-        aix_inittab "disable #{new_resource.service_name}" do
-          runlevel options['inittab']['runlevel']
+        aix_inittab "#{new_resource.service_name}" do
+          runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
+          processaction "once"
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
           action :disable
         end
@@ -64,8 +64,7 @@ module PoiseService
 
       def destroy_service
         Chef::Log.debug("Destroying aix service #{new_resource.service_name}")
-        aix_subsystem "delete #{new_resource.service_name}" do
-          subsystem_name new_resource.service_name
+        aix_subsystem "#{new_resource.service_name}" do
           action :delete
         end
       end
