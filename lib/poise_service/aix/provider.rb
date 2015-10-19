@@ -38,7 +38,7 @@ module PoiseService
         aix_subsystem "create #{new_resource.service_name}" do
           subsystem_name new_resource.service_name
           program command.first
-          arguments command.shift
+          arguments command.drop(1)
           user new_resource.user
         end
       end
