@@ -12,56 +12,61 @@ require 'poise_service/error'
 require 'poise_service/service_providers/base'
 
 module PoiseService
-  module Aix
+  module ServiceProviders
     # Poise-service provider for AIX.
     # @since 1.0.0
-    class Provider
-      provides(:aix_service, os: 'aix')
+    class Provider < Base
+      include Chef::Mixin::ShellOut
+      provides(:aix_service)
+      DEFAULT_RUN_LEVEL = '2'
+      DEFAULT_PROCESS_ACTION = 'once'
 
-      # The reload action for the AIX service provider.
-      def action_reload
-        return if options['never_reload']
-        # TODO: not sure?
+      def self.provides_auto?(node, resource)
+        node['platform_family'] == 'aix'
       end
 
       # Parse the PID from `lssrc -s <name>` output.
       # @return [Integer]
       def pid
-        # TODO: implement this
+        service = shell_out!("lssrc -s #{@new_resource.service_name}").stdout
+        service.split(' ')[-1].to_i
       end
 
       private
 
       def create_service
+        Chef::Log.debug("Creating aix service #{new_resource.service_name}")
         command = new_resource.command.split(' ')
-        aix_subsystem "create #{new_resource.service_name}" do
-          subsystem_name new_resource.service_name
+        aix_subsystem "#{new_resource.service_name}" do
           program command.first
-          arguments command.shift
+          arguments command.drop(1).join(' ')
           user new_resource.user
+          auto_restart true
         end
       end
 
       def enable_service
-        options['inittab']['runlevel'] ||= 2
-        aix_inittab "enable #{new_resource.service_name}" do
-          runlevel options['inittab']['runlevel']
+        Chef::Log.debug("Enabling aix service #{new_resource.service_name}")
+        aix_inittab "#{new_resource.service_name}" do
+          runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
+          processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
         end
       end
 
       def disable_service
-        options['inittab']['runlevel'] ||= 2
-        aix_inittab "disable #{new_resource.service_name}" do
-          runlevel options['inittab']['runlevel']
+        Chef::Log.debug("Disabling aix service #{new_resource.service_name}")
+        aix_inittab "#{new_resource.service_name}" do
+          runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
+          processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
-          action :disable
+          action :remove
         end
       end
 
       def destroy_service
-        aix_subsystem "disable #{new_resource.service_name}" do
-          subsystem_name new_resource.service_name
+        Chef::Log.debug("Destroying aix service #{new_resource.service_name}")
+        aix_subsystem "#{new_resource.service_name}" do
           action :delete
         end
       end
