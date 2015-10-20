@@ -21,7 +21,7 @@ module PoiseService
       DEFAULT_RUN_LEVEL = '2'
       DEFAULT_PROCESS_ACTION = 'once'
 
-      def self.provides_auto?(node, resource)
+      def self.provides_auto?(node, _)
         node['platform_family'] == 'aix'
       end
 

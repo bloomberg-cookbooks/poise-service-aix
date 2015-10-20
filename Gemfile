@@ -8,3 +8,7 @@
 
 source 'https://rubygems.org'
 gemspec path: File.expand_path('..', __FILE__)
+
+group :test, :development do
+  gem 'rubocop'
+end
