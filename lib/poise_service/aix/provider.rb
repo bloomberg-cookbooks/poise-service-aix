@@ -19,6 +19,7 @@ module PoiseService
       include Chef::Mixin::ShellOut
       provides(:aix_service)
       DEFAULT_RUN_LEVEL = '2'
+      DEFAULT_PROCESS_ACTION = 'once'
 
       def self.provides_auto?(node, resource)
         node['platform_family'] == 'aix'
@@ -47,7 +48,7 @@ module PoiseService
         Chef::Log.debug("Enabling aix service #{new_resource.service_name}")
         aix_inittab "#{new_resource.service_name}" do
           runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
-          processaction "once"
+          processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
         end
       end
@@ -56,7 +57,7 @@ module PoiseService
         Chef::Log.debug("Disabling aix service #{new_resource.service_name}")
         aix_inittab "#{new_resource.service_name}" do
           runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
-          processaction "once"
+          processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
           action :disable
         end
