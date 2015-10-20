@@ -39,8 +39,9 @@ module PoiseService
         command = new_resource.command.split(' ')
         aix_subsystem "#{new_resource.service_name}" do
           program command.first
-          arguments command.drop(1)
+          arguments command.drop(1).join(' ')
           user new_resource.user
+          auto_restart true
         end
       end
 
@@ -59,7 +60,7 @@ module PoiseService
           runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
           processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
-          action :disable
+          action :remove
         end
       end
 
