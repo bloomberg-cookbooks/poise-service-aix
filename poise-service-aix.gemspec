@@ -13,9 +13,9 @@ require 'poise_service/aix/version'
 Gem::Specification.new do |spec|
   spec.name = 'poise-service-aix'
   spec.version = PoiseService::AIX::VERSION
-  spec.authors = ['John Bellone']
-  spec.email = %w{jbellone@bloomberg.net}
-  spec.description = 'An extension for poise-service to support AIX.'
+  spec.authors = ['John Bellone', 'Shahul Khajamohideen']
+  spec.email = %w{jbellone@bloomberg.net skhajamohid1@bloomberg.net}
+  spec.description = 'An AIX provider for poise-service.'
   spec.summary = spec.description
   spec.homepage = 'https://github.com/johnbellone/poise-service-aix'
   spec.license = 'Apache 2.0'
