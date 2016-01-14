@@ -18,6 +18,10 @@ module PoiseService
     class Provider < Base
       include Chef::Mixin::ShellOut
       provides(:aix_service)
+
+      # proritize this provider on aix
+      Chef::Platform::ProviderPriorityMap.instance.priority(:poise_service, [self])
+
       DEFAULT_RUN_LEVEL = '2'
       DEFAULT_PROCESS_ACTION = 'once'
 
