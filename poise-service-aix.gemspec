@@ -3,7 +3,7 @@
 # License: Apache 2.0
 #
 # Copyright 2015, Noah Kantrowitz
-# Copyright 2015, Bloomberg Finance L.P.
+# Copyright 2015-2016, Bloomberg Finance L.P.
 #
 
 lib = File.expand_path('../lib', __FILE__)
@@ -31,5 +31,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'poise-boiler', '~> 1.0'
 
-  spec.metadata['halite_dependencies'] = 'aix ~> 0.1.0'
+  spec.metadata['halite_dependencies'] = 'aix ~> 1.0'
 end
