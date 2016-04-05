@@ -84,10 +84,6 @@ module PoiseService
         end
       end
 
-      def service_options(r)
-        r.never_reload(true)
-      end
-
       def service_provider
         super.tap do |r|
           r.provider(Chef::Provider::Service::Aix)
