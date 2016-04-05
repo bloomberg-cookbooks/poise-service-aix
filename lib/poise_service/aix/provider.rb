@@ -14,7 +14,7 @@ require 'poise_service/service_providers/base'
 module PoiseService
   module ServiceProviders
     # Poise-service provider for AIX.
-    # @since 1.0.0
+    # @since 1.0
     class Provider < Base
       include Chef::Mixin::ShellOut
       provides(:aix_service)
@@ -36,12 +36,21 @@ module PoiseService
         service.split(' ')[-1].to_i
       end
 
+      def action_reload
+        if service_resource.running
+          Chef::Log.info("Reloading AIX service #{new_resource.service_name} by restarting")
+          action_restart
+        else
+          Chef::Log.debug("Reloading AIX service #{new_resource.service_name} - not running")
+        end
+      end
+
       private
 
       def create_service
         Chef::Log.debug("Creating aix service #{new_resource.service_name}")
         command = new_resource.command.split(' ')
-        aix_subsystem "#{new_resource.service_name}" do
+        aix_subsystem new_resource.service_name do
           program command.first
           arguments command.drop(1).join(' ')
           user new_resource.user
@@ -51,7 +60,7 @@ module PoiseService
 
       def enable_service
         Chef::Log.debug("Enabling aix service #{new_resource.service_name}")
-        aix_inittab "#{new_resource.service_name}" do
+        aix_inittab new_resource.service_name do
           runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
           processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
@@ -60,7 +69,7 @@ module PoiseService
 
       def disable_service
         Chef::Log.debug("Disabling aix service #{new_resource.service_name}")
-        aix_inittab "#{new_resource.service_name}" do
+        aix_inittab new_resource.service_name do
           runlevel options['runlevel'] ||= DEFAULT_RUN_LEVEL
           processaction options['processaction'] ||= DEFAULT_PROCESS_ACTION
           command "/usr/bin/startsrc -s #{new_resource.service_name} >/dev/console 2>&1"
@@ -70,9 +79,13 @@ module PoiseService
 
       def destroy_service
         Chef::Log.debug("Destroying aix service #{new_resource.service_name}")
-        aix_subsystem "#{new_resource.service_name}" do
+        aix_subsystem new_resource.service_name do
           action :delete
         end
+      end
+
+      def service_options(r)
+        r.never_reload(true)
       end
 
       def service_provider
