@@ -37,11 +37,11 @@ module PoiseService
       end
 
       def action_reload
-        if service_resource.running
+        if service_resource.current_value.running
           Chef::Log.info("Reloading AIX service #{new_resource.service_name} by restarting")
           action_restart
         else
-          Chef::Log.debug("Reloading AIX service #{new_resource.service_name} - not running")
+          Chef::Log.info("Reloading AIX service #{new_resource.service_name} - not running ")
         end
       end
 
