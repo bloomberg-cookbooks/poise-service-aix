@@ -36,13 +36,20 @@ module PoiseService
         service.split(' ')[-1].to_i
       end
 
-      def action_reload
+      def action_restart
         if service_resource.current_value.running
-          Chef::Log.info("Reloading AIX service #{new_resource.service_name} by restarting")
-          action_restart
+          Chef::Log.info("Restarting AIX service #{new_resource.service_name} - running")
+          action_stop
+          sleep 1 # AIX does not support synchronous stopping of services
+          action_start
         else
-          Chef::Log.info("Reloading AIX service #{new_resource.service_name} - not running ")
+          Chef::Log.info("Restarting AIX service #{new_resource.service_name} - not running ")
+          action_start
         end
+      end
+
+      def action_reload
+        action_restart
       end
 
       private
