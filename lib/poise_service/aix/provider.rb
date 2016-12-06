@@ -62,6 +62,7 @@ module PoiseService
           arguments command.drop(1).join(' ')
           user new_resource.user
           auto_restart true
+          use_signals false
         end
       end
 
