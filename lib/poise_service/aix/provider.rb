@@ -3,10 +3,8 @@
 # License: Apache 2.0
 #
 # Copyright 2015, Noah Kantrowitz
-# Copyright 2015-2016, Bloomberg Finance L.P.
+# Copyright 2015-2017, Bloomberg Finance L.P.
 #
-
-require 'chef/mash'
 
 require 'poise_service/error'
 require 'poise_service/service_providers/base'
@@ -22,8 +20,8 @@ module PoiseService
       # proritize this provider on aix
       Chef::Platform::ProviderPriorityMap.instance.priority(:poise_service, [self])
 
-      DEFAULT_RUN_LEVEL = '2'
-      DEFAULT_PROCESS_ACTION = 'once'
+      DEFAULT_RUN_LEVEL = '2'.freeze
+      DEFAULT_PROCESS_ACTION = 'once'.freeze
 
       def self.provides_auto?(node, _)
         node['platform_family'] == 'aix'
