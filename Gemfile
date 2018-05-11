@@ -11,4 +11,6 @@ gemspec path: File.expand_path('..', __FILE__)
 
 group :test, :development do
   gem 'rubocop'
+  gem 'halite'
+  gem 'poise-boiler'
 end
