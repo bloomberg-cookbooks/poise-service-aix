@@ -20,6 +20,13 @@ Development sponsored by [Bloomberg](http://www.bloomberg.com/company/technology
 
 The Poise test server infrastructure is sponsored by [Rackspace](https://rackspace.com/).
 
+## Additional options
+
+`poise-service-aix` uses these options in the "options" field of `poise-service`:
+* processaction: default `once` - see AIX service documentation
+* runlevel: default `2` - see AIX service documentation
+* sleep_duration: default `1` - How long to sleep between stop and start when "restarting" a service.
+
 ## License
 
 Copyright 2015, Noah Kantrowitz

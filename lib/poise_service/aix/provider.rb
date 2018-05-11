@@ -40,7 +40,11 @@ module PoiseService
         if service_resource.current_value.running
           Chef::Log.info("Restarting AIX service #{new_resource.service_name} - running")
           action_stop
-          sleep 1 # AIX does not support synchronous stopping of services
+          # AIX does not support synchronous stopping of services
+          # Some services may take a long time to stop, so allow them to sleep for longer
+          sleep_duration = options['sleep_duration'] || 1
+          Chef::Log.info("Sleeping for #{sleep_duration} seconds to give service time to stop cleanly")
+          sleep sleep_duration
           action_start
         else
           Chef::Log.info("Restarting AIX service #{new_resource.service_name} - not running ")
