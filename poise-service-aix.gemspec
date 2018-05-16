@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.email = %w{jbellone@bloomberg.net skhajamohid1@bloomberg.net}
   spec.description = 'An AIX provider for poise-service.'
   spec.summary = spec.description
-  spec.homepage = 'https://github.com/johnbellone/poise-service-aix'
+  spec.homepage = 'https://github.com/bloomberg-cookbooks/poise-service-aix'
   spec.license = 'Apache 2.0'
 
   spec.files = `git ls-files`.split($RS)
